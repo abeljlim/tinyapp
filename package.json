@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/abeljlim/tinyapp/issues"
   },
-  "homepage": "https://github.com/abeljlim/tinyapp#readme"
+  "homepage": "https://github.com/abeljlim/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
