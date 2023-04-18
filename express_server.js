@@ -50,8 +50,16 @@ app.get("/urls.json", (req, res) => {
 
 app.post("/urls", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
-  const randomString = generateRandomString();
-  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+  let randomString = generateRandomString();
+  
+  // prevent collisions with other random strings by regenerating the string as long as it already exists in urlDatabase
+  while(urlDatabase[randomString]) {
+    randomString = generateRandomString();
+  }
+  
+  urlDatabase[randomString] = req.body.longURL;
+  res.redirect(`/urls/${randomString}`);
+  // res.send("Ok"); // Respond with 'Ok' (we will replace this)
 });
 
 app.get("/urls", (req, res) => {
