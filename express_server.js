@@ -48,6 +48,7 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
+// ADD
 app.post("/urls", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
   let randomString = generateRandomString();
@@ -61,15 +62,18 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${randomString}`);
 });
 
+// BROWSE
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
 
+// ADD
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+// DELETE
 app.post("/urls/:id/delete", (req, res) => {
   // edge case: non-existent ID - could do a 404?
   console.log(`deleting urlDatabase property { "${req.params.id}": "${urlDatabase[req.params.id]}" }`);
@@ -77,6 +81,14 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect('/urls');
 });
 
+// EDIT
+app.post("/urls/:id", (req, res) => {
+  // get longURL and update the urlDatabase object with it
+  urlDatabase[req.params.id] = req.body.longURL;
+  res.redirect('/urls');
+});
+
+// READ
 app.get("/urls/:id", (req, res) => {
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
   res.render("urls_show", templateVars);
