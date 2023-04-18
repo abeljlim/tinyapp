@@ -75,6 +75,15 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+app.get("/u/:id", (req, res) => {
+  // const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
+  // res.render("urls_show", templateVars);
+
+  // edge case: non-existent ID - could do a 404
+  const longURL = urlDatabase[req.params.id];
+  res.redirect(longURL);
+});
+
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
