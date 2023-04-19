@@ -89,6 +89,13 @@ app.post("/login", (req, res) => {
   res.redirect('/urls');
 });
 
+// CLEAR COOKIE
+app.post("/logout", (req, res) => {
+  // get username and create cookie with it
+  res.clearCookie('username');
+  res.redirect('/urls');
+});
+
 // DELETE
 app.post("/urls/:id/delete", (req, res) => {
   // edge case: non-existent ID - could do a 404?
