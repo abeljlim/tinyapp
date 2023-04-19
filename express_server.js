@@ -52,6 +52,10 @@ const users = {
   },
 };
 
+const findUserFromEmail = email => {
+  return Object.keys(users).find(elem => users[elem].email === email);
+}
+
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
@@ -89,6 +93,20 @@ app.get("/register", (req, res) => {
 // REGISTER (POST)
 app.post("/register", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
+  // Edge case 1: If the e-mail or password are empty strings, send back a response with the 400 status code.
+  // Edge case 2: If someone tries to register with an email that is already in the users object, send back a response with the 400 status code.
+  if(req.body.email === "" || req.body.password === "" || findUserFromEmail(req.body.email)) {
+    const templateVars = {
+      user: users[req.cookies["user_id"]],
+    }
+    res.status(400).render("urls_registration", templateVars)
+    console.log('users', users);
+    return;
+  }
+  // if(!Object.keys(users).find(elem => users[elem].email === req.body.email)) { // elem is key
+  //   res.status(400).render("urls_registration")
+  // }
+
   let randomString = generateRandomString();
 
   // prevent collisions with other random strings by regenerating the string as long as it already exists in urlDatabase
