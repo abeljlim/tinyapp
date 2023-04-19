@@ -237,7 +237,29 @@ app.post("/logout", (req, res) => {
 
 // DELETE
 app.post("/urls/:id/delete", (req, res) => {
-  // edge case: non-existent ID - could do a 404?
+  console.log('req.cookies["user_id"]', req.cookies["user_id"]);
+  console.log('users', users);
+
+  // edge case: URL not found at all
+  if (!urlDatabase[req.params.id]) {
+    res.status(404).send("404 URL Not Found");
+    return;
+  }
+
+  // edge case: user not logged in, but URL is found
+  if(!users[req.cookies["user_id"]]) {
+    res.status(401).send("Sorry, you do not have access to this URL because you are not logged in.");
+    return;
+  }
+
+  // edge case: URL is found and user is logged in, but user doesn't own the URL
+  const filteredUrlDatabase = urlsForUser(req.cookies["user_id"]);
+  if (!filteredUrlDatabase[req.params.id]) {
+    res.status(403).send("403 Forbidden URL (you don't own it!)");
+    return;
+  }
+
+  // happy path: user is logged in, and owns the URL
   console.log(`deleting urlDatabase property { "${req.params.id}": "${urlDatabase[req.params.id]}" }`);
   delete urlDatabase[req.params.id];
   res.redirect('/urls');
@@ -245,6 +267,33 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // EDIT
 app.post("/urls/:id", (req, res) => {
+
+  // edge case: URL not found at all
+  if (!urlDatabase[req.params.id]) {
+    res.status(404).send("404 URL Not Found");
+    return;
+  }
+
+  // edge case: user not logged in, but URL is found
+  if(!users[req.cookies["user_id"]]) {
+    res.status(401).send("Sorry, you do not have access to this URL because you are not logged in.");
+    return;
+  }
+
+  // edge case: URL is found and user is logged in, but user doesn't own the URL
+  const filteredUrlDatabase = urlsForUser(req.cookies["user_id"]);
+  if (!filteredUrlDatabase[req.params.id]) {
+    res.status(403).send("403 Forbidden URL (you don't own it!)");
+    return;
+  }
+
+  // edge case: non-existent user ID
+  if(!users[req.cookies["user_id"]]) {
+    res.status(401).send("Sorry, you do not have access to this URL because you are not logged in.");
+    return;
+  }
+
+  // happy path: user is logged in, and owns the URL
   // get longURL and update the urlDatabase object with it
   urlDatabase[req.params.id].longURL = req.body.longURL;
   res.redirect('/urls');
@@ -252,12 +301,13 @@ app.post("/urls/:id", (req, res) => {
 
 // READ
 app.get("/urls/:id", (req, res) => {
-  const filteredUrlDatabase = urlsForUser(req.cookies["user_id"]);
-  // edge case: non-existent ID
+  // edge case: non-existent user ID
   if(!users[req.cookies["user_id"]]) {
     res.status(401).send("Sorry, you do not have access to this URL because you are not logged in.");
     return;
   }
+
+  const filteredUrlDatabase = urlsForUser(req.cookies["user_id"]);
 
   // edge case: user is logged in here, but the ID is still nonexistent for the user
   if (!filteredUrlDatabase[req.params.id]) {
