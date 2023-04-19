@@ -73,6 +73,13 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+// COOKIE
+app.post("/login", (req, res) => {
+  // get longURL and update the urlDatabase object with it
+  res.cookie('username', req.body.username);
+  res.redirect('/urls');
+});
+
 // DELETE
 app.post("/urls/:id/delete", (req, res) => {
   // edge case: non-existent ID - could do a 404?
