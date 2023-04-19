@@ -42,8 +42,8 @@ const urlDatabase = {
 const users = {
   userRandomID: {
     id: "userRandomID",
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur",
+    email: "a@a.com",
+    password: "p",
   },
   user2RandomID: {
     id: "user2RandomID",
@@ -54,7 +54,7 @@ const users = {
 
 const findUserFromEmail = email => {
   return Object.keys(users).find(elem => users[elem].email === email);
-}
+};
 
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -95,11 +95,21 @@ app.post("/register", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
   // Edge case 1: If the e-mail or password are empty strings, send back a response with the 400 status code.
   // Edge case 2: If someone tries to register with an email that is already in the users object, send back a response with the 400 status code.
-  if(req.body.email === "" || req.body.password === "" || findUserFromEmail(req.body.email)) {
-    const templateVars = {
-      user: users[req.cookies["user_id"]],
-    }
-    res.status(400).render("urls_registration", templateVars)
+  if (req.body.email === "" || req.body.password === "") {
+    // const templateVars = {
+    //   user: users[req.cookies["user_id"]],
+    // };
+    // res.status(400).render("urls_registration", templateVars);
+
+    // Doing it like the lecture
+    res.status(400).send("Please provide both an email and a password.");
+    console.log('users', users);
+    return;
+  }
+  
+  // Doing it like the lecture
+  if(findUserFromEmail(req.body.email)) {
+    res.status(400).send("That email was already taken!");
     console.log('users', users);
     return;
   }
@@ -119,6 +129,22 @@ app.post("/register", (req, res) => {
   res.cookie('user_id', randomString);
   console.log('users', users);
   res.redirect(`/urls`);
+});
+
+// LOGIN (GET)
+app.get("/login", (req, res) => {
+  const templateVars = {
+    user: users[req.cookies["user_id"]],
+  };
+  res.render("urls_login", templateVars);
+});
+
+// LOGIN (POST)
+app.post("/login", (req, res) => {
+  const templateVars = {
+    user: users[req.cookies["user_id"]],
+  };
+  res.render("urls_login", templateVars);
 });
 
 // BROWSE
@@ -171,7 +197,7 @@ app.post("/urls/:id", (req, res) => {
 // READ
 app.get("/urls/:id", (req, res) => {
   // edge case: non-existent ID - could do a 404
-  if(!urlDatabase[req.params.id]) {
+  if (!urlDatabase[req.params.id]) {
     res.status(404).send("404 URL Not Found");
     return;
   }
@@ -186,7 +212,7 @@ app.get("/urls/:id", (req, res) => {
 
 app.get("/u/:id", (req, res) => {
   // edge case: non-existent ID - could do a 404 (repeated code, but a separate function seems unnecessary)
-  if(!urlDatabase[req.params.id]) {
+  if (!urlDatabase[req.params.id]) {
     res.status(404).send("404 URL Not Found");
     return;
   }
