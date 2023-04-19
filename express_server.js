@@ -39,6 +39,19 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk",
+  },
+};
+
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
@@ -64,13 +77,42 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${randomString}`);
 });
 
+// REGISTER (GET)
+app.get("/register", (req, res) => {
+  const templateVars = {
+    // req.body.email
+    username: req.cookies["username"],
+  };
+  res.render("urls_registration", templateVars);
+});
+
+// REGISTER (POST)
+app.post("/register", (req, res) => {
+  console.log(req.body); // Log the POST request body to the console
+  let randomString = generateRandomString();
+
+  // prevent collisions with other random strings by regenerating the string as long as it already exists in urlDatabase
+  while (users[randomString]) {
+    randomString = generateRandomString();
+  }
+
+  users[randomString] = {
+    id: randomString,
+    email: req.body.email,
+    password: req.body.password,
+  };
+  res.cookie('user_id', randomString);
+  console.log('users[randomString]', users[randomString]);
+  res.redirect(`/urls`);
+});
+
 // BROWSE
 app.get("/urls", (req, res) => {
   const templateVars = {
     username: req.cookies["username"],
     urls: urlDatabase,
   };
-  console.log(templateVars); // as advised by Nally
+  console.log('templateVars', templateVars); // as advised by Nally
   res.render("urls_index", templateVars);
 });
 
@@ -149,6 +191,15 @@ app.get("/set", (req, res) => {
 
 app.get("/fetch", (req, res) => {
   res.send(`a = ${a}`);
+});
+
+app.post("*", (req, res) => {
+  res.status(404).send("<html><body>404 Not Found</body></html>\n");
+});
+
+
+app.get("*", (req, res) => {
+  res.status(404).send("<html><body>404 Not Found</body></html>\n");
 });
 
 app.listen(PORT, () => {
