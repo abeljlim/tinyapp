@@ -70,6 +70,13 @@ app.get("/urls.json", (req, res) => {
 
 // ADD
 app.post("/urls", (req, res) => {
+  
+  // If user is not logged in, then send a client error message
+  if(!users[req.cookies["user_id"]]) {
+    res.status(401).send("You cannot create a new URL because you are not logged in!");
+    return;
+  }
+
   console.log(req.body); // Log the POST request body to the console
   let randomString = generateRandomString();
 
@@ -150,6 +157,12 @@ app.get("/urls", (req, res) => {
 
 // ADD
 app.get("/urls/new", (req, res) => {
+  // If user is not logged in, then redirect
+  if(!users[req.cookies["user_id"]]) {
+    res.redirect("/login");
+    return;
+  }
+
   const templateVars = {
     user: users[req.cookies["user_id"]],
   };
