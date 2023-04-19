@@ -84,6 +84,12 @@ app.post("/urls", (req, res) => {
 
 // REGISTER (GET)
 app.get("/register", (req, res) => {
+  // If user is logged in, then redirect
+  if(users[req.cookies["user_id"]]) {
+    res.redirect("/urls");
+    return;
+  }
+
   const templateVars = {
     // req.body.email
     user: users[req.cookies["user_id"]],
@@ -152,6 +158,12 @@ app.get("/urls/new", (req, res) => {
 
 // LOGIN (GET)
 app.get("/login", (req, res) => {
+  // If user is logged in, then redirect
+  if(users[req.cookies["user_id"]]) {
+    res.redirect("/urls");
+    return;
+  }
+
   const templateVars = {
     user: users[req.cookies["user_id"]],
   };
