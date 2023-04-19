@@ -237,8 +237,6 @@ app.post("/logout", (req, res) => {
 
 // DELETE
 app.post("/urls/:id/delete", (req, res) => {
-  console.log('req.cookies["user_id"]', req.cookies["user_id"]);
-  console.log('users', users);
 
   // edge case: URL not found at all
   if (!urlDatabase[req.params.id]) {
