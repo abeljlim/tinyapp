@@ -131,22 +131,6 @@ app.post("/register", (req, res) => {
   res.redirect(`/urls`);
 });
 
-// LOGIN (GET)
-app.get("/login", (req, res) => {
-  const templateVars = {
-    user: users[req.cookies["user_id"]],
-  };
-  res.render("urls_login", templateVars);
-});
-
-// LOGIN (POST)
-app.post("/login", (req, res) => {
-  const templateVars = {
-    user: users[req.cookies["user_id"]],
-  };
-  res.render("urls_login", templateVars);
-});
-
 // BROWSE
 app.get("/urls", (req, res) => {
   const templateVars = {
@@ -165,7 +149,24 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
+// LOGIN (GET)
+app.get("/login", (req, res) => {
+  const templateVars = {
+    user: users[req.cookies["user_id"]],
+  };
+  res.render("urls_login", templateVars);
+});
+
+// LOGIN (POST)
+// app.post("/login", (req, res) => {
+//   const templateVars = {
+//     user: users[req.cookies["user_id"]],
+//   };
+//   res.render("urls_login", templateVars);
+// });
+
 // COOKIE
+// OLD LOGIN POST ROUTE
 app.post("/login", (req, res) => {
   // get username and create cookie with it
   res.cookie('username', req.body.username);
