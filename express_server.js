@@ -159,15 +159,6 @@ app.get("/login", (req, res) => {
 });
 
 // LOGIN (POST)
-// app.post("/login", (req, res) => {
-//   const templateVars = {
-//     user: users[req.cookies["user_id"]],
-//   };
-//   res.render("urls_login", templateVars);
-// });
-
-// COOKIE
-// OLD LOGIN POST ROUTE
 app.post("/login", (req, res) => {
   const user = findUserFromEmail(req.body.email);
 
