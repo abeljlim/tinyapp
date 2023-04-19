@@ -75,7 +75,7 @@ app.get("/urls/new", (req, res) => {
 
 // COOKIE
 app.post("/login", (req, res) => {
-  // get longURL and update the urlDatabase object with it
+  // get username and create cookie with it
   res.cookie('username', req.body.username);
   res.redirect('/urls');
 });
