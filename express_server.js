@@ -53,7 +53,8 @@ const users = {
 };
 
 const findUserFromEmail = email => {
-  return Object.keys(users).find(elem => users[elem].email === email);
+  const userKey = Object.keys(users).find(key => users[key].email === email);
+  return users[userKey];
 };
 
 app.use(express.urlencoded({ extended: true }));
@@ -137,7 +138,7 @@ app.get("/urls", (req, res) => {
     user: users[req.cookies["user_id"]],
     urls: urlDatabase,
   };
-  console.log('templateVars', templateVars); // as advised by Nally
+  console.log('users', users); // as advised by Nally
   res.render("urls_index", templateVars);
 });
 
@@ -168,16 +169,29 @@ app.get("/login", (req, res) => {
 // COOKIE
 // OLD LOGIN POST ROUTE
 app.post("/login", (req, res) => {
-  // get username and create cookie with it
-  res.cookie('username', req.body.username);
+  const user = findUserFromEmail(req.body.email);
+
+  // Error checking - e-mail not found
+  if(!user) {
+    res.status(403).send("E-mail not found!");
+    return;
+  }
+  
+  // Error checking - not matching password
+  if(user.password !== req.body.password) {
+    res.status(403).send("Password does not match!");
+    return;
+  }
+
+  res.cookie('user_id', user.id);
   res.redirect('/urls');
 });
 
 // CLEAR COOKIE
 app.post("/logout", (req, res) => {
-  // get username and create cookie with it
-  res.clearCookie('username');
-  res.redirect('/urls');
+  // remove cookie with user_id
+  res.clearCookie('user_id');
+  res.redirect('/login');
 });
 
 // DELETE
