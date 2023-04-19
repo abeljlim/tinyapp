@@ -113,6 +113,12 @@ app.post("/urls/:id", (req, res) => {
 
 // READ
 app.get("/urls/:id", (req, res) => {
+  // edge case: non-existent ID - could do a 404
+  if(!urlDatabase[req.params.id]) {
+    res.status(404).send("404 URL Not Found");
+    return;
+  }
+
   const templateVars = {
     username: req.cookies["username"],
     id: req.params.id,
@@ -122,7 +128,12 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.get("/u/:id", (req, res) => {
-  // edge case: non-existent ID - could do a 404
+  // edge case: non-existent ID - could do a 404 (repeated code, but a separate function seems unnecessary)
+  if(!urlDatabase[req.params.id]) {
+    res.status(404).send("404 URL Not Found");
+    return;
+  }
+
   const longURL = urlDatabase[req.params.id];
   res.redirect(longURL);
 });
