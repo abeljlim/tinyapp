@@ -103,9 +103,6 @@ app.post("/register", (req, res) => {
     console.log('users', users);
     return;
   }
-  // if(!Object.keys(users).find(elem => users[elem].email === req.body.email)) { // elem is key
-  //   res.status(400).render("urls_registration")
-  // }
 
   let randomString = generateRandomString();
 
