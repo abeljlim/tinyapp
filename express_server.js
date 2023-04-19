@@ -81,7 +81,7 @@ app.post("/urls", (req, res) => {
 app.get("/register", (req, res) => {
   const templateVars = {
     // req.body.email
-    username: req.cookies["username"],
+    user: users[req.cookies["user_id"]],
   };
   res.render("urls_registration", templateVars);
 });
@@ -102,14 +102,14 @@ app.post("/register", (req, res) => {
     password: req.body.password,
   };
   res.cookie('user_id', randomString);
-  console.log('users[randomString]', users[randomString]);
+  console.log('users', users);
   res.redirect(`/urls`);
 });
 
 // BROWSE
 app.get("/urls", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"],
+    user: users[req.cookies["user_id"]],
     urls: urlDatabase,
   };
   console.log('templateVars', templateVars); // as advised by Nally
@@ -119,7 +119,7 @@ app.get("/urls", (req, res) => {
 // ADD
 app.get("/urls/new", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"],
+    user: users[req.cookies["user_id"]],
   };
   res.render("urls_new", templateVars);
 });
@@ -162,7 +162,7 @@ app.get("/urls/:id", (req, res) => {
   }
 
   const templateVars = {
-    username: req.cookies["username"],
+    user: users[req.cookies["user_id"]],
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
   };
