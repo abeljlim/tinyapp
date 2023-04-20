@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-var cookieSession = require('cookie-session')
+var cookieSession = require('cookie-session');
 const bcrypt = require("bcryptjs");
 const PORT = 3000; // default port 8080
 
@@ -36,7 +36,7 @@ const generateRandomString = function() {
 };
 
 const urlDatabase = {
-  "b2xVn2": { 
+  "b2xVn2": {
     longURL: "http://www.lighthouselabs.ca",
     userID: "userRandomID",
   },
@@ -64,21 +64,21 @@ const findUserFromEmail = email => {
   return users[userKey];
 };
 
-const urlsForUser = id => { 
+const urlsForUser = id => {
   const filteredUrlDatabase = {};
-  for(const urlID in urlDatabase) {
-    if(urlDatabase[urlID].userID === id) {
+  for (const urlID in urlDatabase) {
+    if (urlDatabase[urlID].userID === id) {
       filteredUrlDatabase[urlID] = urlDatabase[urlID];
     }
   }
   return filteredUrlDatabase;
-}
+};
 
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({
   name: 'session',
   keys: [/* secret keys ... not sure if I want to use these names */'secretkey1', 'secondsecretkey2'],
-}))
+}));
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -90,9 +90,9 @@ app.get("/urls.json", (req, res) => {
 
 // ADD
 app.post("/urls", (req, res) => {
-  
+
   // If user is not logged in, then send a client error message
-  if(!users[req.session.user_id]) {
+  if (!users[req.session.user_id]) {
     res.status(401).send("You cannot create a new URL because you are not logged in!");
     return;
   }
@@ -116,7 +116,7 @@ app.post("/urls", (req, res) => {
 // REGISTER (GET)
 app.get("/register", (req, res) => {
   // If user is logged in, then redirect
-  if(users[req.session.user_id]) {
+  if (users[req.session.user_id]) {
     res.redirect("/urls");
     return;
   }
@@ -138,9 +138,9 @@ app.post("/register", (req, res) => {
     console.log('users', users);
     return;
   }
-  
+
   // Doing it like the lecture
-  if(findUserFromEmail(req.body.email)) {
+  if (findUserFromEmail(req.body.email)) {
     res.status(400).send("That email was already taken!");
     console.log('users', users);
     return;
@@ -169,7 +169,7 @@ app.post("/register", (req, res) => {
 // BROWSE
 app.get("/urls", (req, res) => {
   // If user is not logged in, then display relevant error message
-  if(!users[req.session.user_id]) {
+  if (!users[req.session.user_id]) {
     res.status(401).send("You have to be logged in to view this page. Please use the Login or Register links before coming to this page.");
     return;
   }
@@ -185,7 +185,7 @@ app.get("/urls", (req, res) => {
 // ADD
 app.get("/urls/new", (req, res) => {
   // If user is not logged in, then redirect
-  if(!users[req.session.user_id]) {
+  if (!users[req.session.user_id]) {
     res.redirect("/login");
     return;
   }
@@ -199,7 +199,7 @@ app.get("/urls/new", (req, res) => {
 // LOGIN (GET)
 app.get("/login", (req, res) => {
   // If user is logged in, then redirect
-  if(users[req.session.user_id]) {
+  if (users[req.session.user_id]) {
     res.redirect("/urls");
     return;
   }
@@ -215,13 +215,13 @@ app.post("/login", (req, res) => {
   const user = findUserFromEmail(req.body.email);
 
   // Error checking - e-mail not found
-  if(!user) {
+  if (!user) {
     res.status(403).send("E-mail not found!");
     return;
   }
-  
+
   // Error checking - not matching password
-  if(!bcrypt.compareSync(req.body.password, user.hashedPassword)) {
+  if (!bcrypt.compareSync(req.body.password, user.hashedPassword)) {
     res.status(403).send("Password does not match!");
     return;
   }
@@ -248,7 +248,7 @@ app.post("/urls/:id/delete", (req, res) => {
   }
 
   // edge case: user not logged in, but URL is found
-  if(!users[req.session.user_id]) {
+  if (!users[req.session.user_id]) {
     res.status(401).send("Sorry, you do not have access to this URL because you are not logged in.");
     return;
   }
@@ -276,7 +276,7 @@ app.post("/urls/:id", (req, res) => {
   }
 
   // edge case: user not logged in, but URL is found
-  if(!users[req.session.user_id]) {
+  if (!users[req.session.user_id]) {
     res.status(401).send("Sorry, you do not have access to this URL because you are not logged in.");
     return;
   }
@@ -289,7 +289,7 @@ app.post("/urls/:id", (req, res) => {
   }
 
   // edge case: non-existent user ID
-  if(!users[req.session.user_id]) {
+  if (!users[req.session.user_id]) {
     res.status(401).send("Sorry, you do not have access to this URL because you are not logged in.");
     return;
   }
@@ -303,7 +303,7 @@ app.post("/urls/:id", (req, res) => {
 // READ
 app.get("/urls/:id", (req, res) => {
   // edge case: non-existent user ID
-  if(!users[req.session.user_id]) {
+  if (!users[req.session.user_id]) {
     res.status(401).send("Sorry, you do not have access to this URL because you are not logged in.");
     return;
   }
