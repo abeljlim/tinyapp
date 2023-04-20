@@ -65,9 +65,9 @@ const findUserFromEmail = email => {
 
 const urlsForUser = id => { 
   const filteredUrlDatabase = {};
-  for(const urlId in urlDatabase) {
-    if(urlDatabase[urlId].userID === id) {
-      filteredUrlDatabase[urlId] = urlDatabase[urlId];
+  for(const urlID in urlDatabase) {
+    if(urlDatabase[urlID].userID === id) {
+      filteredUrlDatabase[urlID] = urlDatabase[urlID];
     }
   }
   return filteredUrlDatabase;
