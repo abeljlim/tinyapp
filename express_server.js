@@ -117,7 +117,6 @@ app.get("/register", (req, res) => {
   }
 
   const templateVars = {
-    // req.body.email
     user: users[req.cookies["user_id"]],
   };
   res.render("urls_registration", templateVars);
@@ -129,11 +128,6 @@ app.post("/register", (req, res) => {
   // Edge case 1: If the e-mail or password are empty strings, send back a response with the 400 status code.
   // Edge case 2: If someone tries to register with an email that is already in the users object, send back a response with the 400 status code.
   if (req.body.email === "" || req.body.password === "") {
-    // const templateVars = {
-    //   user: users[req.cookies["user_id"]],
-    // };
-    // res.status(400).render("urls_registration", templateVars);
-
     // Doing it like the lecture
     res.status(400).send("Please provide both an email and a password.");
     console.log('users', users);
