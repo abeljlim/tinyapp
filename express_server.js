@@ -88,7 +88,7 @@ app.get("/urls.json", (req, res) => {
 app.post("/urls", (req, res) => {
 
   // If user is not logged in, then send a client error message
-  if (!users[req.session.user_id]) {
+  if (!users[req.session.userID]) {
     res.status(401).send("You cannot create a new URL because you are not logged in!");
     return;
   }
@@ -102,7 +102,7 @@ app.post("/urls", (req, res) => {
 
   urlDatabase[randomString] = {
     longURL: req.body.longURL,
-    userID: req.session.user_id,
+    userID: req.session.userID,
   };
 
   console.log(urlDatabase);
@@ -112,13 +112,13 @@ app.post("/urls", (req, res) => {
 // REGISTER (GET)
 app.get("/register", (req, res) => {
   // If user is logged in, then redirect
-  if (users[req.session.user_id]) {
+  if (users[req.session.userID]) {
     res.redirect("/urls");
     return;
   }
 
   const templateVars = {
-    user: users[req.session.user_id],
+    user: users[req.session.userID],
   };
   res.render("urls_registration", templateVars);
 });
@@ -156,8 +156,7 @@ app.post("/register", (req, res) => {
     email: req.body.email,
     hashedPassword: hashedPassword,
   };
-  // res.cookie('user_id', randomString);
-  req.session.user_id = randomString;
+  req.session.userID = randomString;
   console.log('users', users);
   res.redirect(`/urls`);
 });
@@ -165,14 +164,14 @@ app.post("/register", (req, res) => {
 // BROWSE
 app.get("/urls", (req, res) => {
   // If user is not logged in, then display relevant error message
-  if (!users[req.session.user_id]) {
+  if (!users[req.session.userID]) {
     res.status(401).send("You have to be logged in to view this page. Please use the Login or Register links before coming to this page.");
     return;
   }
 
   const templateVars = {
-    user: users[req.session.user_id],
-    urls: urlsForUser(req.session.user_id),
+    user: users[req.session.userID],
+    urls: urlsForUser(req.session.userID),
   };
   console.log('users', users); // as advised by Nally
   res.render("urls_index", templateVars);
@@ -181,13 +180,13 @@ app.get("/urls", (req, res) => {
 // ADD
 app.get("/urls/new", (req, res) => {
   // If user is not logged in, then redirect
-  if (!users[req.session.user_id]) {
+  if (!users[req.session.userID]) {
     res.redirect("/login");
     return;
   }
 
   const templateVars = {
-    user: users[req.session.user_id],
+    user: users[req.session.userID],
   };
   res.render("urls_new", templateVars);
 });
@@ -195,13 +194,13 @@ app.get("/urls/new", (req, res) => {
 // LOGIN (GET)
 app.get("/login", (req, res) => {
   // If user is logged in, then redirect
-  if (users[req.session.user_id]) {
+  if (users[req.session.userID]) {
     res.redirect("/urls");
     return;
   }
 
   const templateVars = {
-    user: users[req.session.user_id],
+    user: users[req.session.userID],
   };
   res.render("urls_login", templateVars);
 });
@@ -222,14 +221,14 @@ app.post("/login", (req, res) => {
     return;
   }
 
-  // res.cookie('user_id', user.id);
-  req.session.user_id = user.id;
+  // res.cookie('userID', user.id);
+  req.session.userID = user.id;
   res.redirect('/urls');
 });
 
 // CLEAR COOKIE
 app.post("/logout", (req, res) => {
-  // remove cookie with user_id
+  // remove cookie with userID
   req.session = null;
   res.redirect('/login');
 });
@@ -244,13 +243,13 @@ app.post("/urls/:id/delete", (req, res) => {
   }
 
   // edge case: user not logged in, but URL is found
-  if (!users[req.session.user_id]) {
+  if (!users[req.session.userID]) {
     res.status(401).send("Sorry, you do not have access to this URL because you are not logged in.");
     return;
   }
 
   // edge case: URL is found and user is logged in, but user doesn't own the URL
-  const filteredUrlDatabase = urlsForUser(req.session.user_id);
+  const filteredUrlDatabase = urlsForUser(req.session.userID);
   if (!filteredUrlDatabase[req.params.id]) {
     res.status(403).send("403 Forbidden URL (you don't own it!)");
     return;
@@ -272,20 +271,20 @@ app.post("/urls/:id", (req, res) => {
   }
 
   // edge case: user not logged in, but URL is found
-  if (!users[req.session.user_id]) {
+  if (!users[req.session.userID]) {
     res.status(401).send("Sorry, you do not have access to this URL because you are not logged in.");
     return;
   }
 
   // edge case: URL is found and user is logged in, but user doesn't own the URL
-  const filteredUrlDatabase = urlsForUser(req.session.user_id);
+  const filteredUrlDatabase = urlsForUser(req.session.userID);
   if (!filteredUrlDatabase[req.params.id]) {
     res.status(403).send("403 Forbidden URL (you don't own it!)");
     return;
   }
 
   // edge case: non-existent user ID
-  if (!users[req.session.user_id]) {
+  if (!users[req.session.userID]) {
     res.status(401).send("Sorry, you do not have access to this URL because you are not logged in.");
     return;
   }
@@ -299,12 +298,12 @@ app.post("/urls/:id", (req, res) => {
 // READ
 app.get("/urls/:id", (req, res) => {
   // edge case: non-existent user ID
-  if (!users[req.session.user_id]) {
+  if (!users[req.session.userID]) {
     res.status(401).send("Sorry, you do not have access to this URL because you are not logged in.");
     return;
   }
 
-  const filteredUrlDatabase = urlsForUser(req.session.user_id);
+  const filteredUrlDatabase = urlsForUser(req.session.userID);
 
   // edge case: user is logged in here, but the ID is still nonexistent for the user
   if (!filteredUrlDatabase[req.params.id]) {
@@ -313,7 +312,7 @@ app.get("/urls/:id", (req, res) => {
   }
 
   const templateVars = {
-    user: users[req.session.user_id],
+    user: users[req.session.userID],
     id: req.params.id,
     longURL: filteredUrlDatabase[req.params.id].longURL,
   };
