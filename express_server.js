@@ -59,9 +59,9 @@ const users = {
   },
 };
 
-const findUserFromEmail = email => {
-  const userKey = Object.keys(users).find(key => users[key].email === email);
-  return users[userKey];
+const findUserFromEmail = (email, database) => {
+  const userKey = Object.keys(database).find(key => database[key].email === email);
+  return database[userKey];
 };
 
 const urlsForUser = id => {
@@ -140,7 +140,7 @@ app.post("/register", (req, res) => {
   }
 
   // Doing it like the lecture
-  if (findUserFromEmail(req.body.email)) {
+  if (findUserFromEmail(req.body.email, users)) {
     res.status(400).send("That email was already taken!");
     console.log('users', users);
     return;
@@ -212,7 +212,7 @@ app.get("/login", (req, res) => {
 
 // LOGIN (POST)
 app.post("/login", (req, res) => {
-  const user = findUserFromEmail(req.body.email);
+  const user = findUserFromEmail(req.body.email, users);
 
   // Error checking - e-mail not found
   if (!user) {
