@@ -78,9 +78,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({
   name: 'session',
   keys: [/* secret keys ... not sure if I want to use these names */'secretkey1', 'secondsecretkey2'],
-
-  // Cookie Options
-  maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }))
 
 app.get("/", (req, res) => {
