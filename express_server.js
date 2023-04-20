@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const cookieParser = require('cookie-parser');
+const bcrypt = require("bcryptjs");
 const PORT = 3000; // default port 8080
 
 app.set("view engine", "ejs");
@@ -49,12 +50,12 @@ const users = {
   userRandomID: {
     id: "userRandomID",
     email: "a@a.com",
-    password: "p",
+    hashedPassword: bcrypt.hashSync("p", 10),
   },
   user2RandomID: {
     id: "user2RandomID",
     email: "b@b.com",
-    password: "o",
+    hashedPassword: bcrypt.hashSync("o", 10),
   },
 };
 
@@ -148,10 +149,12 @@ app.post("/register", (req, res) => {
     randomString = generateRandomString();
   }
 
+  const hashedPassword = bcrypt.hashSync(req.body.password, 10);
+
   users[randomString] = {
     id: randomString,
     email: req.body.email,
-    password: req.body.password,
+    hashedPassword: hashedPassword,
   };
   res.cookie('user_id', randomString);
   console.log('users', users);
@@ -213,7 +216,7 @@ app.post("/login", (req, res) => {
   }
   
   // Error checking - not matching password
-  if(user.password !== req.body.password) {
+  if(!bcrypt.compareSync(req.body.password, user.hashedPassword)) {
     res.status(403).send("Password does not match!");
     return;
   }
