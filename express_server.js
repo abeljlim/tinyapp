@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 var cookieSession = require('cookie-session');
 const bcrypt = require("bcryptjs");
+const { findUserFromEmail } = require('./helpers');
 const PORT = 3000; // default port 8080
 
 app.set("view engine", "ejs");
@@ -57,11 +58,6 @@ const users = {
     email: "b@b.com",
     hashedPassword: bcrypt.hashSync("o", 10),
   },
-};
-
-const findUserFromEmail = (email, database) => {
-  const userKey = Object.keys(database).find(key => database[key].email === email);
-  return database[userKey];
 };
 
 const urlsForUser = id => {
