@@ -1,6 +1,5 @@
 const express = require("express");
 const app = express();
-const cookieParser = require('cookie-parser');
 var cookieSession = require('cookie-session')
 const bcrypt = require("bcryptjs");
 const PORT = 3000; // default port 8080
@@ -78,7 +77,7 @@ const urlsForUser = id => {
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({
   name: 'session',
-  keys: [/* secret keys ... not sure if I want to use these names */'secretkey1', 'secretkey2'],
+  keys: [/* secret keys ... not sure if I want to use these names */'secretkey1', 'secondsecretkey2'],
 
   // Cookie Options
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
@@ -238,7 +237,7 @@ app.post("/login", (req, res) => {
 // CLEAR COOKIE
 app.post("/logout", (req, res) => {
   // remove cookie with user_id
-  delete req.session.user_id; // not sure if this works
+  req.session = null;
   res.redirect('/login');
 });
 
