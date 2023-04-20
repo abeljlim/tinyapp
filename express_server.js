@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const cookieParser = require('cookie-parser');
+var cookieSession = require('cookie-session')
 const bcrypt = require("bcryptjs");
 const PORT = 3000; // default port 8080
 
@@ -75,7 +76,13 @@ const urlsForUser = id => {
 }
 
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: [/* secret keys ... not sure if I want to use these names */'secretkey1', 'secretkey2'],
+
+  // Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -89,7 +96,7 @@ app.get("/urls.json", (req, res) => {
 app.post("/urls", (req, res) => {
   
   // If user is not logged in, then send a client error message
-  if(!users[req.cookies["user_id"]]) {
+  if(!users[req.session.user_id]) {
     res.status(401).send("You cannot create a new URL because you are not logged in!");
     return;
   }
@@ -103,7 +110,7 @@ app.post("/urls", (req, res) => {
 
   urlDatabase[randomString] = {
     longURL: req.body.longURL,
-    userID: req.cookies["user_id"],
+    userID: req.session.user_id,
   };
 
   console.log(urlDatabase);
@@ -113,13 +120,13 @@ app.post("/urls", (req, res) => {
 // REGISTER (GET)
 app.get("/register", (req, res) => {
   // If user is logged in, then redirect
-  if(users[req.cookies["user_id"]]) {
+  if(users[req.session.user_id]) {
     res.redirect("/urls");
     return;
   }
 
   const templateVars = {
-    user: users[req.cookies["user_id"]],
+    user: users[req.session.user_id],
   };
   res.render("urls_registration", templateVars);
 });
@@ -157,7 +164,8 @@ app.post("/register", (req, res) => {
     email: req.body.email,
     hashedPassword: hashedPassword,
   };
-  res.cookie('user_id', randomString);
+  // res.cookie('user_id', randomString);
+  req.session.user_id = randomString;
   console.log('users', users);
   res.redirect(`/urls`);
 });
@@ -165,14 +173,14 @@ app.post("/register", (req, res) => {
 // BROWSE
 app.get("/urls", (req, res) => {
   // If user is not logged in, then display relevant error message
-  if(!users[req.cookies["user_id"]]) {
+  if(!users[req.session.user_id]) {
     res.status(401).send("You have to be logged in to view this page. Please use the Login or Register links before coming to this page.");
     return;
   }
 
   const templateVars = {
-    user: users[req.cookies["user_id"]],
-    urls: urlsForUser(req.cookies["user_id"]),
+    user: users[req.session.user_id],
+    urls: urlsForUser(req.session.user_id),
   };
   console.log('users', users); // as advised by Nally
   res.render("urls_index", templateVars);
@@ -181,13 +189,13 @@ app.get("/urls", (req, res) => {
 // ADD
 app.get("/urls/new", (req, res) => {
   // If user is not logged in, then redirect
-  if(!users[req.cookies["user_id"]]) {
+  if(!users[req.session.user_id]) {
     res.redirect("/login");
     return;
   }
 
   const templateVars = {
-    user: users[req.cookies["user_id"]],
+    user: users[req.session.user_id],
   };
   res.render("urls_new", templateVars);
 });
@@ -195,13 +203,13 @@ app.get("/urls/new", (req, res) => {
 // LOGIN (GET)
 app.get("/login", (req, res) => {
   // If user is logged in, then redirect
-  if(users[req.cookies["user_id"]]) {
+  if(users[req.session.user_id]) {
     res.redirect("/urls");
     return;
   }
 
   const templateVars = {
-    user: users[req.cookies["user_id"]],
+    user: users[req.session.user_id],
   };
   res.render("urls_login", templateVars);
 });
@@ -222,14 +230,15 @@ app.post("/login", (req, res) => {
     return;
   }
 
-  res.cookie('user_id', user.id);
+  // res.cookie('user_id', user.id);
+  req.session.user_id = user.id;
   res.redirect('/urls');
 });
 
 // CLEAR COOKIE
 app.post("/logout", (req, res) => {
   // remove cookie with user_id
-  res.clearCookie('user_id');
+  delete req.session.user_id; // not sure if this works
   res.redirect('/login');
 });
 
@@ -243,13 +252,13 @@ app.post("/urls/:id/delete", (req, res) => {
   }
 
   // edge case: user not logged in, but URL is found
-  if(!users[req.cookies["user_id"]]) {
+  if(!users[req.session.user_id]) {
     res.status(401).send("Sorry, you do not have access to this URL because you are not logged in.");
     return;
   }
 
   // edge case: URL is found and user is logged in, but user doesn't own the URL
-  const filteredUrlDatabase = urlsForUser(req.cookies["user_id"]);
+  const filteredUrlDatabase = urlsForUser(req.session.user_id);
   if (!filteredUrlDatabase[req.params.id]) {
     res.status(403).send("403 Forbidden URL (you don't own it!)");
     return;
@@ -271,20 +280,20 @@ app.post("/urls/:id", (req, res) => {
   }
 
   // edge case: user not logged in, but URL is found
-  if(!users[req.cookies["user_id"]]) {
+  if(!users[req.session.user_id]) {
     res.status(401).send("Sorry, you do not have access to this URL because you are not logged in.");
     return;
   }
 
   // edge case: URL is found and user is logged in, but user doesn't own the URL
-  const filteredUrlDatabase = urlsForUser(req.cookies["user_id"]);
+  const filteredUrlDatabase = urlsForUser(req.session.user_id);
   if (!filteredUrlDatabase[req.params.id]) {
     res.status(403).send("403 Forbidden URL (you don't own it!)");
     return;
   }
 
   // edge case: non-existent user ID
-  if(!users[req.cookies["user_id"]]) {
+  if(!users[req.session.user_id]) {
     res.status(401).send("Sorry, you do not have access to this URL because you are not logged in.");
     return;
   }
@@ -298,12 +307,12 @@ app.post("/urls/:id", (req, res) => {
 // READ
 app.get("/urls/:id", (req, res) => {
   // edge case: non-existent user ID
-  if(!users[req.cookies["user_id"]]) {
+  if(!users[req.session.user_id]) {
     res.status(401).send("Sorry, you do not have access to this URL because you are not logged in.");
     return;
   }
 
-  const filteredUrlDatabase = urlsForUser(req.cookies["user_id"]);
+  const filteredUrlDatabase = urlsForUser(req.session.user_id);
 
   // edge case: user is logged in here, but the ID is still nonexistent for the user
   if (!filteredUrlDatabase[req.params.id]) {
@@ -312,7 +321,7 @@ app.get("/urls/:id", (req, res) => {
   }
 
   const templateVars = {
-    user: users[req.cookies["user_id"]],
+    user: users[req.session.user_id],
     id: req.params.id,
     longURL: filteredUrlDatabase[req.params.id].longURL,
   };
