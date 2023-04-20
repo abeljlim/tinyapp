@@ -94,7 +94,6 @@ app.post("/urls", (req, res) => {
     return;
   }
 
-  console.log(req.body); // Log the POST request body to the console
   let randomString = generateRandomString();
 
   // prevent collisions with other random strings by regenerating the string as long as it already exists in urlDatabase
@@ -104,8 +103,10 @@ app.post("/urls", (req, res) => {
 
   urlDatabase[randomString] = {
     longURL: req.body.longURL,
-    userID: users[req.cookies["user_id"]],
+    userID: req.cookies["user_id"],
   };
+
+  console.log(urlDatabase);
   res.redirect(`/urls/${randomString}`);
 });
 
