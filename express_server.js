@@ -112,7 +112,6 @@ app.post("/urls", (req, res) => {
     userID: req.session.userID,
   };
 
-  console.log(urlDatabase);
   res.redirect(`/urls/${randomString}`);
 });
 
@@ -132,18 +131,15 @@ app.get("/register", (req, res) => {
 
 // REGISTER (POST)
 app.post("/register", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
   // Edge case 1: If the e-mail or password are empty strings, send back a response with the 400 status code.
   // Edge case 2: If someone tries to register with an email that is already in the users object, send back a response with the 400 status code.
   if (req.body.email === "" || req.body.password === "") {
     res.status(400).send("Please provide both an email and a password.");
-    console.log('users', users);
     return;
   }
 
   if (findUserFromEmail(req.body.email, users)) {
     res.status(400).send("That email was already taken!");
-    console.log('users', users);
     return;
   }
 
@@ -162,7 +158,6 @@ app.post("/register", (req, res) => {
     hashedPassword: hashedPassword,
   };
   req.session.userID = randomString;
-  console.log('users', users);
   res.redirect(`/urls`);
 });
 
@@ -178,7 +173,6 @@ app.get("/urls", (req, res) => {
     user: users[req.session.userID],
     urls: urlsForUser(req.session.userID),
   };
-  console.log('users', users); // as advised by Nally
   res.render("urls_index", templateVars);
 });
 
@@ -255,7 +249,6 @@ app.post("/urls/:id/delete", (req, res) => {
   }
 
   // happy path: user is logged in, and owns the URL
-  console.log(`deleting urlDatabase property { "${req.params.id}": "${urlDatabase[req.params.id]}" }`);
   delete urlDatabase[req.params.id];
   res.redirect('/urls');
 });
