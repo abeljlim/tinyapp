@@ -229,7 +229,7 @@ app.post("/logout", (req, res) => {
 
 // DELETE
 app.post("/urls/:id/delete", (req, res) => {
-
+  console.log('delete urlDatabase', urlDatabase);
   // edge case: URL not found at all
   if (!urlDatabase[req.params.id]) {
     res.status(404).send("404 URL Not Found");
@@ -256,7 +256,7 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // EDIT
 app.post("/urls/:id", (req, res) => {
-
+  console.log('edit urlDatabase', urlDatabase);
   // edge case: URL not found at all
   if (!urlDatabase[req.params.id]) {
     res.status(404).send("404 URL Not Found");
@@ -276,12 +276,6 @@ app.post("/urls/:id", (req, res) => {
     return;
   }
 
-  // edge case: non-existent user ID
-  if (!users[req.session.userID]) {
-    res.status(401).send("Sorry, you do not have access to this URL because you are not logged in.");
-    return;
-  }
-
   // happy path: user is logged in, and owns the URL
   // get longURL and update the urlDatabase object with it
   urlDatabase[req.params.id].longURL = req.body.longURL;
@@ -290,6 +284,12 @@ app.post("/urls/:id", (req, res) => {
 
 // READ
 app.get("/urls/:id", (req, res) => {
+  // edge case: URL not found at all
+  if (!urlDatabase[req.params.id]) {
+    res.status(404).send("404 URL Not Found");
+    return;
+  }
+
   // edge case: non-existent user ID
   if (!users[req.session.userID]) {
     res.status(401).send("Sorry, you do not have access to this URL because you are not logged in.");
