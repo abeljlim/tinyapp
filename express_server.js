@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-var cookieSession = require('cookie-session');
+const cookieSession = require('cookie-session');
 const bcrypt = require("bcryptjs");
 const { findUserFromEmail } = require('./helpers');
 const PORT = 3000; // default port 8080
@@ -14,13 +14,12 @@ const generateRandomString = function() {
     // ASCII chars are in values 48-57, 65-90, 97-122 -> 62 values
     const randomVal = Math.floor(Math.random() * 62);
     let randomValCharCode;
-    // digit
     if (randomVal < 10) {
+      // digit
       const randomValWithinDigits = randomVal + 48;
       randomValCharCode = randomValWithinDigits;
-    }
-    // uppercase char
-    else if (randomVal < 36) {
+    } else if (randomVal < 36) {
+      // uppercase char
       // consider the top 26 values only
       const randomValWithinUppercaseChars = randomVal - 10 + 65;
       randomValCharCode = randomValWithinUppercaseChars;
@@ -79,7 +78,7 @@ app.use(cookieSession({
 app.get("/", (req, res) => {
   // If user is not logged in, then redirect to /login
   if (!users[req.session.userID]) {
-    res.redirect('/login')
+    res.redirect('/login');
     return;
   }
 
