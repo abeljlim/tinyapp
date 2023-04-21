@@ -68,7 +68,7 @@ const users = {
   },
 };
 
-const urlsForUser = (id, urlDatabase) => {
+const getUrlsForUser = (id, urlDatabase) => {
   const filteredUrlDatabase = {};
   for (const urlID in urlDatabase) {
     if (urlDatabase[urlID].userID === id) {
@@ -173,7 +173,7 @@ app.get("/urls", (req, res) => {
 
   const templateVars = {
     user: users[req.session.userID],
-    urls: urlsForUser(req.session.userID, urlDatabase),
+    urls: getUrlsForUser(req.session.userID, urlDatabase),
   };
   res.render("urls_index", templateVars);
 });
@@ -242,7 +242,7 @@ app.post("/urls/:id/delete", (req, res) => {
   }
 
   // edge case: URL is found and user is logged in, but user doesn't own the URL
-  const filteredUrlDatabase = urlsForUser(req.session.userID, urlDatabase);
+  const filteredUrlDatabase = getUrlsForUser(req.session.userID, urlDatabase);
   if (!filteredUrlDatabase[req.params.id]) {
     res.status(403).send("403 Forbidden URL (you don't own it!)");
     return;
@@ -268,7 +268,7 @@ app.post("/urls/:id", (req, res) => {
   }
 
   // edge case: URL is found and user is logged in, but user doesn't own the URL
-  const filteredUrlDatabase = urlsForUser(req.session.userID, urlDatabase);
+  const filteredUrlDatabase = getUrlsForUser(req.session.userID, urlDatabase);
   if (!filteredUrlDatabase[req.params.id]) {
     res.status(403).send("403 Forbidden URL (you don't own it!)");
     return;
@@ -294,7 +294,7 @@ app.get("/urls/:id", (req, res) => {
     return;
   }
 
-  const filteredUrlDatabase = urlsForUser(req.session.userID, urlDatabase);
+  const filteredUrlDatabase = getUrlsForUser(req.session.userID, urlDatabase);
 
   // edge case: user is logged in here, but the ID is still nonexistent for the user
   if (!filteredUrlDatabase[req.params.id]) {
