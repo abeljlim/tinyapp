@@ -77,7 +77,14 @@ app.use(cookieSession({
 }));
 
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  // If user is not logged in, then redirect to /login
+  if (!users[req.session.userID]) {
+    res.redirect('/login')
+    return;
+  }
+
+  // If user is logged in, then redirect to /urls
+  res.redirect('/urls');
 });
 
 app.get("/urls.json", (req, res) => {
@@ -209,15 +216,9 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const user = findUserFromEmail(req.body.email, users);
 
-  // Error checking - e-mail not found
-  if (!user) {
-    res.status(403).send("E-mail not found!");
-    return;
-  }
-
-  // Error checking - not matching password
-  if (!bcrypt.compareSync(req.body.password, user.hashedPassword)) {
-    res.status(403).send("Password does not match!");
+  // Error checking - e-mail / password not matching
+  if (!user || !bcrypt.compareSync(req.body.password, user.hashedPassword)) {
+    res.status(400).send("Invalid e-mail / password.");
     return;
   }
 
