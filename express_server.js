@@ -145,6 +145,7 @@ app.post("/register", (req, res) => {
     return;
   }
 
+  // happy path
   let randomString = generateRandomString();
 
   // prevent collisions with other random strings by regenerating the string as long as it already exists in urlDatabase
@@ -153,7 +154,6 @@ app.post("/register", (req, res) => {
   }
 
   const hashedPassword = bcrypt.hashSync(req.body.password, 10);
-
   users[randomString] = {
     id: randomString,
     email: req.body.email,
