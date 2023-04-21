@@ -5,7 +5,16 @@ const bcrypt = require("bcryptjs");
 const { findUserFromEmail } = require('./helpers');
 const PORT = 3000;
 
+
+// configuration
 app.set("view engine", "ejs");
+
+// middleware
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieSession({
+  name: 'session',
+  keys: ['secretkey1', 'secondsecretkey2'],
+}));
 
 const generateRandomString = function() {
   // return a string of 6 random alphanumeric characters
@@ -68,12 +77,6 @@ const urlsForUser = id => {
   }
   return filteredUrlDatabase;
 };
-
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieSession({
-  name: 'session',
-  keys: ['secretkey1', 'secondsecretkey2'],
-}));
 
 app.get("/", (req, res) => {
   // If user is not logged in, then redirect to /login
