@@ -3,7 +3,7 @@ const app = express();
 const cookieSession = require('cookie-session');
 const bcrypt = require("bcryptjs");
 const { findUserFromEmail } = require('./helpers');
-const PORT = 3000; // default port 8080
+const PORT = 3000;
 
 app.set("view engine", "ejs");
 
@@ -72,7 +72,7 @@ const urlsForUser = id => {
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({
   name: 'session',
-  keys: [/* secret keys ... not sure if I want to use these names */'secretkey1', 'secondsecretkey2'],
+  keys: ['secretkey1', 'secondsecretkey2'],
 }));
 
 app.get("/", (req, res) => {
@@ -213,7 +213,6 @@ app.post("/login", (req, res) => {
     return;
   }
 
-  // res.cookie('userID', user.id);
   req.session.userID = user.id;
   res.redirect('/urls');
 });
@@ -324,7 +323,6 @@ app.get("/u/:id", (req, res) => {
 app.post("*", (req, res) => {
   res.status(404).send("<html><body>404 Not Found</body></html>\n");
 });
-
 
 app.get("*", (req, res) => {
   res.status(404).send("<html><body>404 Not Found</body></html>\n");

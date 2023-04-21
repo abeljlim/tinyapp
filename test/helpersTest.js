@@ -17,7 +17,8 @@ const testUsers = {
 describe('findUserFromEmail', function() {
   it('should return a user with valid email', function() {
     const existingUser = findUserFromEmail("user@example.com", testUsers);
-    // Write your assert statement here
+    
+    // Check equality of existingUser to the user object with id userRandomID
     assert.deepEqual(existingUser, {
       id: "userRandomID",
       email: "user@example.com",
