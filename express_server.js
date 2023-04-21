@@ -136,13 +136,11 @@ app.post("/register", (req, res) => {
   // Edge case 1: If the e-mail or password are empty strings, send back a response with the 400 status code.
   // Edge case 2: If someone tries to register with an email that is already in the users object, send back a response with the 400 status code.
   if (req.body.email === "" || req.body.password === "") {
-    // Doing it like the lecture
     res.status(400).send("Please provide both an email and a password.");
     console.log('users', users);
     return;
   }
 
-  // Doing it like the lecture
   if (findUserFromEmail(req.body.email, users)) {
     res.status(400).send("That email was already taken!");
     console.log('users', users);
@@ -218,7 +216,7 @@ app.post("/login", (req, res) => {
 
   // Error checking - e-mail / password not matching
   if (!user || !bcrypt.compareSync(req.body.password, user.hashedPassword)) {
-    res.status(400).send("Invalid e-mail / password.");
+    res.status(401).send("Invalid e-mail / password.");
     return;
   }
 
