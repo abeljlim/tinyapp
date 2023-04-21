@@ -229,7 +229,6 @@ app.post("/logout", (req, res) => {
 
 // DELETE
 app.post("/urls/:id/delete", (req, res) => {
-  console.log('delete urlDatabase', urlDatabase);
   // edge case: URL not found at all
   if (!urlDatabase[req.params.id]) {
     res.status(404).send("404 URL Not Found");
@@ -256,7 +255,6 @@ app.post("/urls/:id/delete", (req, res) => {
 
 // EDIT
 app.post("/urls/:id", (req, res) => {
-  console.log('edit urlDatabase', urlDatabase);
   // edge case: URL not found at all
   if (!urlDatabase[req.params.id]) {
     res.status(404).send("404 URL Not Found");
